@@ -120,15 +120,18 @@ var tables = 	{
 						)
 		};
 
-//alert(tables["test"][0]["foo"]);
 
+// namespace
+var JQuerySQL = JQuerySQL || {};
 
 
 // ################
 // ################ THE PARSER
 // ################
 //
-var parser = new Object()
+JQuerySQL.parser = {};
+
+with (JQuerySQL) {
 
 // strip the string of tags, spaces, tabs and newlines
 parser.sanitize = function(sql) {
@@ -149,6 +152,7 @@ parser.logicwords = new Array("and", "or");
 parser.symbols = new Array("=", "<", ">", "<>", "<=", ">=");
 
 parser.flush = function () {
+
 	parser.tokens = new Object();
 	// select has array of children, each child is a column
 	parser.tokens.select = new Object();
@@ -419,6 +423,8 @@ parser.generateCondFunction = function (conditions) {
 
 }
 
+}// end with JQuerySQL
+
 
 // ################
 // ################ GENERATOR 
@@ -426,7 +432,9 @@ parser.generateCondFunction = function (conditions) {
 //
 // Generates html for displaying tables based on the input
 
-generator = new Object();
+JQuerySQL.generator = {};
+
+with (JQuerySQL) {
 
 generator.getTableAsString = function(table_name, cols_array, condition_function) {
 
@@ -464,6 +472,8 @@ generator.getTableAsString = function(table_name, cols_array, condition_function
 	return out;
 }
 
+} // end with
+
 
 
 $(document).ready(function() {
@@ -471,22 +481,22 @@ $(document).ready(function() {
 	$("#sub").click( function () {
 
 		var sql = $("#sql").val();
-		sql = parser.sanitize(sql);
+		sql = JQuerySQL.parser.sanitize(sql);
 
 		try
 		{
-			parser.parse(sql);
+			JQuerySQL.parser.parse(sql);
 	
-			if(parser.tokens.where.exists)
-				cond = parser.generateCondFunction(tokens.where.children);
+			if(JQuerySQL.parser.tokens.where.exists)
+				cond = JQuerySQL.parser.generateCondFunction(tokens.where.children);
 			else
 				cond = function (obj) {return true};
 		
-			var html = generator.getTableAsString(	parser.tokens.from.name,
-								parser.tokens.select.children,
+			var html = JQuerySQL.generator.getTableAsString(	JQuerySQL.parser.tokens.from.name,
+								JQuerySQL.parser.tokens.select.children,
 								cond);
 
-			$("#result").html("<strong>Table: " + parser.tokens.from.name + "</strong><br />" + html );
+			$("#result").html("<strong>Table: " + JQuerySQL.parser.tokens.from.name + "</strong><br />" + html );
 		}
 		catch(parse_error)
 		{
