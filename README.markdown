@@ -32,15 +32,15 @@ You can read about implementation details and inspiration for this project in [t
 
 **Things that work:**
 
-    * Simple select statements: `select firstname, lastname from students where gpa > 3.0`
+* Simple select statements: `select firstname, lastname from students where gpa > 3.0`
 
 **Things that do not work:**
 
-    * The `select *` idiom is not implemented
-    * No aggregation functions like `sum` or `count`
-    * No `order by` clause
-    * No joins of any kind (single table operations only)
-    * Some syntax is problematic (eg `gpa > 2.0` works but `gpa>2.0` does not)
+* The `select *` idiom is not implemented
+* No aggregation functions like `sum` or `count`
+* No `order by` clause
+* No joins of any kind (single table operations only)
+* Some syntax is problematic (eg `gpa > 2.0` works but `gpa>2.0` does not)
 
 Dependencies:
 ---
