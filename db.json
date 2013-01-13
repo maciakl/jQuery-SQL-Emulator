@@ -1,8 +1,9 @@
 { 
-			"test" :    [	
-							{"foo": 1, "bar": "baz"}, 
-							{"foo": 2, "bar": "bam"}, 
-							{"foo": 5, "bar": "aaa"}
+			"kitchen" : [	
+							{"id": 1, "name": "chair"}, 
+							{"id": 2, "name": "table"}, 
+							{"id": 3, "name": "sink"}, 
+							{"id": 4, "name": "stool"}
 						],
 
 			"student" : [

@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<script type="text/javascript" src="components/jquery/jquery.js"></script>
+		<script type="text/javascript" src="components/jquery.string.1.1.0-min/index.js"></script>
+		<script type="text/javascript" src="JSQ.js"></script>
+
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+                $("#sub").click( function () {
+                    JSQ.parse($("#sql").val(), 'db.json', function(result){
+                        $("#result").html(result);
+                    });
+                    return false;
+                });
+            });
+
+        </script>
+	</head>
+
+	<body>
+
+		<h2>SQL Teaching Tool</h2>
+
+		<p>Tables:</p>
+
+			<ul>
+				<li><strong>student</strong> <em>columns:[ first, last, gpa, major, state ]</em></li>
+				<li><strong>kitchen</strong> <em>columns:[ id, name ]</em></li>
+			</ul>
+		
+		</small>
+
+		<p></p><div id="result" class="embed"></div><p></p>
+
+		<h3>Query:</h3>
+
+		<p><small>Use simple SELECT statements; SELECT * is not implemented;<br> Put spaces in between stuff (ie. <em>"foo &gt; 2"</em> works, <em>"foo&gt;2"</em> does not</small></p>
+
+		<form name="test">
+			<p><textarea name="sql" id="sql" cols="50" rows="10">SELECT
+	first, last, major, state, gpa
+FROM
+	student
+WHERE
+	gpa &gt;= 2.0
+
+			</textarea></p>
+
+			<input type="button" value="submit" id="sub">
+
+	</form>
+</body>
