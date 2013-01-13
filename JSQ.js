@@ -356,7 +356,7 @@ with (JSQ) {
  * @param callback Callback function which gets called with results
  *
  */
-JSQ.parse = function (sql, database_url, callback)
+JSQ.query = function (sql, database_url, callback)
 {
     $.getJSON(database_url, function(data) {
 

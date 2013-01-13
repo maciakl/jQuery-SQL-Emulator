@@ -8,7 +8,7 @@
 
             $(document).ready(function() {
                 $("#sub").click( function () {
-                    JSQ.parse($("#sql").val(), 'db.json', function(result){
+                    JSQ.query($("#sql").val(), 'db.json', function(result){
                         $("#result").html(result);
                     });
                     return false;

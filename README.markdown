@@ -22,7 +22,7 @@ Put it somewhere on your server. Then you can just do:
     var sql = 'select id, name from kitchen';
     var db = 'db.json';
 
-    JSQ.parse(sql, db, function(result){
+    JSQ.query(sql, db, function(result){
             document.write(result);
     });
 
