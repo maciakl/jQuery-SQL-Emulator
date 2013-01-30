@@ -50,13 +50,26 @@ JSQ depends on the following components:
   - [jQuery Framework][jq]
   - [jQuery.string Plugin][ds] by David E. Still
 
+Development time dependencies are:
+
+* [Node.js][no]
+* [Bower][bo] (depends on node)
+* [Grunt.js][gj] (optional, depends on node)
+
 You can easily install these dependencies using [Bower][bo] by going to the project directory:
 
     bower install
 
 This will create a `components` folder in that directory with all the dependencies. If you do this, then `example.html` should just work. If you don't want to use Bower then simply download latest jQuery and Dot String plugin and modify the links in the example file.
 
+Running Example
+---
+
+The example file makes a json request so you need a server. If you don't have one, just run `grunt` from the project directory. You will need node.js and grunt.js to do this. Added bonus is that grunt will lint the Javascript for you.
+
 [ti]: http://www.terminally-incoherent.com/blog/2009/05/12/sql-emulation-tool-in-javascript/
 [ds]: http://stilldesigning.com/dotstring/
 [bo]: http://twitter.github.com/bower/
 [jq]: http://jquery.org
+[no]: http://nodejs.org
+[gj]: http://gruntjs.com/

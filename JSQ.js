@@ -3,15 +3,14 @@
 var JSQ = JSQ || {};
 
 // Namespace for functions dealing with parsing SQL
-JSQ.parser = {};
+JSQ.parser= {};
 
 // Namespace for functions dealing with generating HTML response
-JSQ.generator = {};
+JSQ.generator= {};
 
-with (JSQ) {
 
     // strip the string of tags, spaces, tabs and newlines
-    parser.sanitize = function(sql) {
+    JSQ.parser.sanitize = function(sql) {
 
         return $.string(sql)
             .strip()
@@ -23,51 +22,51 @@ with (JSQ) {
             .str
     }
 
-    parser.startwords = new Array( "select", "insert", "update", "delete", "create", "drop");
-    parser.stopwords = new Array("from", "where", "set");
-    parser.logicwords = new Array("and", "or");
-    parser.symbols = new Array("=", "<", ">", "<>", "<=", ">=");
+    JSQ.parser.startwords = new Array( "select", "insert", "update", "delete", "create", "drop");
+    JSQ.parser.stopwords = new Array("from", "where", "set");
+    JSQ.parser.logicwords = new Array("and", "or");
+    JSQ.parser.symbols = new Array("=", "<", ">", "<>", "<=", ">=");
 
-    parser.flush = function () {
+    JSQ.parser.flush = function () {
 
-        parser.tokens = new Object();
+        JSQ.parser.tokens = {};
         // select has array of children, each child is a column
-        parser.tokens.select = new Object();
-        parser.tokens.select.exists = false;
-        parser.tokens.select.full = false;
-        parser.tokens.select.children = new Array();
+        JSQ.parser.tokens.select = {};
+        JSQ.parser.tokens.select.exists = false;
+        JSQ.parser.tokens.select.full = false;
+        JSQ.parser.tokens.select.children = [];
 
         // from holds the name of the table
-        parser.tokens.from = new Object();
-        parser.tokens.from.exists = false;
-        parser.tokens.from.full = false;
+        JSQ.parser.tokens.from = {};
+        JSQ.parser.tokens.from.exists = false;
+        JSQ.parser.tokens.from.full = false;
 
         // where has an array of children, - they are and + or
-        parser.tokens.where = new Object();
-        parser.tokens.where.exists = false;
-        parser.tokens.where.children = new Array();
-        parser.tokens.where.children[0] = new Object();
-        parser.tokens.where.children[0].full = false;
+        JSQ.parser.tokens.where = {};
+        JSQ.parser.tokens.where.exists = false;
+        JSQ.parser.tokens.where.children = [];
+        JSQ.parser.tokens.where.children[0] = {};
+        JSQ.parser.tokens.where.children[0].full = false;
     }
 
 
-    parser.parse = function(sql_in) {
+    JSQ.parser.parse = function(sql_in) {
 
         // flush previous tokens
-        parser.flush();
+        JSQ.parser.flush();
 
         // splitting the string on spaces to create token array
-        var sql = parser.sanitize(sql_in).split(" ");
+        var sql = JSQ.parser.sanitize(sql_in).split(" ");
 
         // check if the first token is a start word
-        if(jQuery.inArray(sql[0].toLowerCase(), parser.startwords) == -1)
+        if(jQuery.inArray(sql[0].toLowerCase(), JSQ.parser.startwords) == -1)
             throw "Illegal start of SQL expression: " + sql[0];
         
 
-        for(i in sql)
+        for(var i in sql)
         {
             word = sql[i];
-            tokens = parser.tokens;
+            tokens = JSQ.parser.tokens;
 
             // lets try to identify SELECT keyword first
             if(word.toLowerCase() == "select" && !tokens.from.exists && !tokens.where.exists)
@@ -82,7 +81,7 @@ with (JSQ) {
             // matches column names only when from and where keywords were not found yet		
             if(tokens.select.exists && !tokens.from.exists && !tokens.where.exists)
             {
-                if(parser.isNotSpecialWord(word))
+                if(JSQ.parser.isNotSpecialWord(word))
                 {
                     if(!tokens.select.full)
                     {
@@ -114,12 +113,12 @@ with (JSQ) {
 
             if(tokens.select.exists && tokens.from.exists && !tokens.where.exists)
             {
-                if(parser.isNotSpecialWord(word))
+                if(JSQ.parser.isNotSpecialWord(word))
                 {
                     if($.string(word).endsWith(",") || tokens.from.full)
                             throw "This took does not support joins. Specify single table";
 
-                    if(parser.tableExists(word))
+                    if(JSQ.parser.tableExists(word))
                     {
                         
                         tokens.from.name = word;
@@ -129,11 +128,11 @@ with (JSQ) {
                         // that the columns from select statement exist
                         if(tokens.select.exists && tokens.select.full)
                         {
-                            for(i in tokens.select.children)
+                            for(var ii in tokens.select.children)
                             {
-                                col = tokens.select.children[i];
+                                col = tokens.select.children[ii];
 
-                                if(!parser.columnExistsInTable(col, word))
+                                if(!JSQ.parser.columnExistsInTable(col, word))
                                     throw "Column " + col + " does not exist in table " + word;
                             }
                         }
@@ -162,13 +161,13 @@ with (JSQ) {
                 current = tokens.where.children[current_len];
 
                 // if you see a logical operator, its time to start a new child
-                if(parser.isLogic(word))
+                if(JSQ.parser.isLogic(word))
                 {
                     // if current child is not full, something is wrong
                     if(!current.full)
                         throw "Unexpected use of " + word;
                     
-                    tokens.where.children[tokens.where.children.length] = 	{
+                    tokens.where.children[tokens.where.children.length] = {
                                                     "full" : false, 
                                                     "logic" : word
                                                 };
@@ -176,7 +175,7 @@ with (JSQ) {
                     current = tokens.where.children[current_len];
                 }
 
-                if(parser.isNotSpecialWord(word))
+                if(JSQ.parser.isNotSpecialWord(word))
                 {
                     // if the first slot is empty fill it
                     if(current.first == null)
@@ -200,7 +199,7 @@ with (JSQ) {
                 }
                 else 
                 {
-                    if(parser.isASymbol(word))
+                    if(JSQ.parser.isASymbol(word))
                     {
                         if(current.first != null && current.second == null )
                                 current.action = word;
@@ -223,49 +222,49 @@ with (JSQ) {
 
     }
 
-    parser.tableExists = function (name) {
+    JSQ.parser.tableExists = function (name) {
 
         //if(jQuery.inArray(name.toLowerCase(), tables) != -1) return true; else return false;
         
-        if(tables[name] != null) return true; else false;
+        if(tables[name] != null) return true; else return false;
     }
 
-    parser.columnExistsInTable = function (column_name, table_name) {
+    JSQ.parser.columnExistsInTable = function (column_name, table_name) {
         if(tables[table_name][0][column_name] != null) return true; else return false;
     }
 
-    parser.isNotSpecialWord = function(word) {
+    JSQ.parser.isNotSpecialWord = function(word) {
 
-            if(	jQuery.inArray(word.toLowerCase(), parser.startwords) == -1 &&
-                jQuery.inArray(word.toLowerCase(), parser.stopwords) == -1 &&
-                jQuery.inArray(word.toLowerCase(), parser.logicwords) == -1 &&
-                jQuery.inArray(word.toLowerCase(), parser.symbols) == -1)
+            if(	jQuery.inArray(word.toLowerCase(), JSQ.parser.startwords) == -1 &&
+                jQuery.inArray(word.toLowerCase(), JSQ.parser.stopwords) == -1 &&
+                jQuery.inArray(word.toLowerCase(), JSQ.parser.logicwords) == -1 &&
+                jQuery.inArray(word.toLowerCase(), JSQ.parser.symbols) == -1)
                     return true;
             else
                     return false;
 
     }
 
-    parser.isASymbol = function (word) {
-        if (jQuery.inArray(word, parser.symbols) != -1)
+    JSQ.parser.isASymbol = function (word) {
+        if (jQuery.inArray(word, JSQ.parser.symbols) != -1)
             return true;
         else
             return false;
     }
 
-    parser.isLogic = function (word) {
-        if (jQuery.inArray(word, parser.logicwords) != -1)
+    JSQ.parser.isLogic = function (word) {
+        if (jQuery.inArray(word, JSQ.parser.logicwords) != -1)
             return true;
         else
             return false;
     }
 
 
-    parser.generateCondFunction = function (conditions) {
+    JSQ.parser.generateCondFunction = function (conditions) {
             
         var tmp = "cond = function(row) { if(";
 
-        for(i in conditions)
+        for(var i in conditions)
         {
             current = conditions[i];
 
@@ -302,35 +301,35 @@ with (JSQ) {
 
 
     // ################
-    // ################ GENERATOR 
+    // ################ JSQ.generator.
     // ################
 
 
     // Generates html for displaying tables based on the input
-    generator.getTableAsString = function(table_name, cols_array, condition_function) {
+    JSQ.generator.getTableAsString = function(table_name, cols_array, condition_function) {
 
         var tabl = tables[table_name];
 
         var out = "<table border='1'>\n<tr>\n";
 
-        for(colnum in cols_array)
+        for(var colnum in cols_array)
         {
             out += "\t<th>" + cols_array[colnum] + "</th>\n";
         }
 
         out += "</tr>\n";
 
-        for(rownum in tabl)
+        for(var rownum in tabl)
         {
             out += "<tr>\n";
 
             row = tabl[rownum];
 
-            for(colnum in cols_array)
+            for(var colnum1 in cols_array)
             {
                 if(condition_function(row))
                 {
-                    col = cols_array[colnum];
+                    col = cols_array[colnum1];
                     out += "\t<td>" + row[col] + "</td>\n";
                 }
             }
@@ -343,7 +342,6 @@ with (JSQ) {
         return out;
     }
 
-} // end with JSQ
 
 
 /**
@@ -372,7 +370,7 @@ JSQ.query = function (sql, database_url, callback)
 			else
 				cond = function (obj) {return true};
 		
-			var html = JSQ.generator.getTableAsString(	JSQ.parser.tokens.from.name,
+			var html = JSQ.generator.getTableAsString(JSQ.parser.tokens.from.name,
 								JSQ.parser.tokens.select.children, cond);
 
 			callback("<strong>Table: " + JSQ.parser.tokens.from.name + "</strong><br />" + html);
